@@ -1,20 +1,23 @@
-import express from "express";
 import "dotenv/config";
+import express from "express";
 
-import pool from "./db/pool.js";
+import env from "./env.js";
+import middlewares from "./mw/index.js";
+
+import usersRoute from "./routes/users.route.js";
+import directoriesRoute from "./routes/directories.route.js";
+import tasksRoute from "./routes/tasks.route.js";
 
 const server = express();
 
-server.get("/pets", async (_, res) => {
-  const data = await pool.sql`SELECT * FROM pets`;
-  res.status(200).json(data.rows);
-});
+server.use(middlewares);
+// server.use("/users", usersRoute);
+server.use("/tasks", tasksRoute);
+server.use("/directories", directoriesRoute);
+server.use("*", (_, res) => res.sendStatus(404));
 
-const SERVER_PORT = process.env["SERVER_PORT"];
-const SERVER_URL = process.env["SERVER_URL"];
-
-server.listen(SERVER_PORT, () =>
-  console.log(`Server is running on ${SERVER_URL}`)
+server.listen(env.SERVER_PORT, () =>
+  console.info(`Server is running on ${env.SERVER_URL}:${env.SERVER_PORT}`)
 );
 
 export default server;

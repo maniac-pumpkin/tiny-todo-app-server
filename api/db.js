@@ -1,5 +1,5 @@
 import { createPool } from "@vercel/postgres";
 
-const pool = createPool();
+const db = createPool();
 
-export default pool;
+export default db;
