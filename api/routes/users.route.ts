@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { z } from "zod";
 import {
-  registerUser,
   signInUser,
+  registerUser,
   verifyUserEmail,
-} from "../controllers/users.controller.js";
-import { validateReqBody } from "../mw/custom.js";
+} from "../controllers/users.controller";
+import { validateReqKey } from "../mw/custom";
 
 const userRegistrationSchema = z.object({
   name: z
@@ -27,8 +27,12 @@ const signInUserSchema = z.object({
 
 const route = Router();
 
-route.post("/register", validateReqBody(userRegistrationSchema), registerUser);
-route.post("/sign-in", validateReqBody(signInUserSchema), signInUser);
+route.post(
+  "/register",
+  validateReqKey(userRegistrationSchema, "body"),
+  registerUser
+);
+route.post("/sign-in", validateReqKey(signInUserSchema, "body"), signInUser);
 route.get("/:userId/:token", verifyUserEmail);
 
 export default route;

@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import env from "../env.js";
+import env from "../env";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.mail.yahoo.com",
@@ -12,7 +12,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendMail = async ({ client, subject, text }) => {
+export const sendMail = async (
+  client: string,
+  subject: string,
+  text: string
+) => {
   try {
     await transporter.sendMail({
       from: `"Tiny Todo App" <${env.EMAIL_USERNAME}>`,
