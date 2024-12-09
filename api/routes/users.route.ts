@@ -31,7 +31,7 @@ const userVerifyEmailSchema = z.object({
 const route = Router();
 
 route.post(
-  "/register",
+  "/sign-up",
   validateReqKey(userRegistrationSchema, "body"),
   registerUser
 );
