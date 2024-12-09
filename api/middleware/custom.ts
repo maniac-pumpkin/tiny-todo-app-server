@@ -1,15 +1,13 @@
 import type { RequestHandler, Request, Response, NextFunction } from "express";
 import { ZodError, ZodSchema } from "zod";
-import jwt from "jsonwebtoken";
-import env from "../env";
 
 export const errorHandler = (
   err: any,
-  req: unknown,
+  req: Request,
   res: Response,
-  next: unknown
+  _: unknown
 ) => {
-  console.error(err);
+  console.error(`${req.method} / Error: ${err}`);
   res
     .status(err.statusCode || 500)
     .send(err.message || "Internal server error");
@@ -39,20 +37,3 @@ export const logger: RequestHandler = (req, _, next) => {
   console.info(req.method, req.hostname, req.path, time);
   next();
 };
-
-// export const resolveJWToken: RequestHandler = async (req, res, next) => {
-//   try {
-//     const token = req.headers.authorization!;
-//     const verifiedToken = jwt.verify(token, env.JWT_SECRET_TOKEN);
-//     const user = await getUserById(verifiedToken.userId);
-
-//     if (!user) {
-//       res.statusCode = 403;
-//       throw new Error("Not authorized.");
-//     }
-
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// };
