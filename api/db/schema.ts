@@ -7,15 +7,15 @@ import {
   unique,
   text,
   timestamp,
-  primaryKey,
+  foreignKey,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
+  username: varchar("username", { length: 100 }).unique().notNull(),
   password: text("password").notNull(),
-  email: varchar("email").notNull().unique(),
+  email: varchar("email", { length: 254 }).unique().notNull(),
   isVerified: boolean("is_verified").default(false),
 });
 
@@ -23,20 +23,19 @@ export const directories = pgTable(
   "directories",
   {
     id: serial("id").primaryKey(),
-    name: varchar("name", { length: 15 }).notNull(),
-    userId: integer("user_id")
-      .notNull()
-      .references(() => users.id, {
-        onUpdate: "cascade",
-        onDelete: "cascade",
-      }),
+    name: varchar("name", { length: 20 }).notNull(),
+    userId: integer("user_id").notNull(),
   },
-  (table) => ({
-    uniqueUserDirectory: unique("unique_user_directory").on(
-      table.userId,
-      table.name
-    ),
-  })
+  (table) => [
+    foreignKey({
+      name: "fk_user_directories",
+      columns: [table.userId],
+      foreignColumns: [users.id],
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+    unique("unique_user_directory").on(table.userId, table.name),
+  ]
 );
 
 export const tasks = pgTable("tasks", {
@@ -47,29 +46,23 @@ export const tasks = pgTable("tasks", {
   isImportant: boolean("is_important").default(false),
   isCompleted: boolean("is_completed").default(false),
   directoryId: integer("directory_id")
-    .notNull()
     .references(() => directories.id, {
       onUpdate: "cascade",
       onDelete: "cascade",
-    }),
+    })
+    .notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const verifyToken = pgTable(
-  "verify_token",
-  {
-    userId: integer("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    token: text("token").notNull(),
-    expDate: timestamp("exp_date")
-      .notNull()
-      .default(sql`NOW() + INTERVAL '10 minutes'`),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.userId, table.token] }),
-  })
-);
+export const verifyToken = pgTable("verify_token", {
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  token: text("token").notNull(),
+  expDate: timestamp("exp_date")
+    .default(sql`NOW() + INTERVAL '10 minutes'`)
+    .notNull(),
+});
 
 export const usersRelations = relations(users, ({ many }) => ({
   directories: many(directories),

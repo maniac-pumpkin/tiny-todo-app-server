@@ -1,7 +1,6 @@
 import type { RequestHandler, Request, Response, NextFunction } from "express";
 import { ZodError, ZodSchema } from "zod";
 import jwt from "jsonwebtoken";
-import { getUserById } from "../helpers/sql-utils";
 import env from "../env";
 
 export const errorHandler = (
@@ -25,7 +24,11 @@ export const validateReqKey = (schema: ZodSchema, reqKey: keyof Request) => {
       if (error instanceof ZodError)
         res
           .status(400)
-          .send(error.errors.map((issue) => issue.message).join(", "));
+          .send(
+            error.errors
+              .map(({ path, message }) => `${path.at(0)}: ${message}`)
+              .join(", ")
+          );
       else next(error);
     }
   };
@@ -37,19 +40,19 @@ export const logger: RequestHandler = (req, _, next) => {
   next();
 };
 
-export const resolveJWToken: RequestHandler = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization!;
-    const verifiedToken = jwt.verify(token, env.JWT_SECRET_TOKEN);
-    const user = await getUserById(verifiedToken.userId);
+// export const resolveJWToken: RequestHandler = async (req, res, next) => {
+//   try {
+//     const token = req.headers.authorization!;
+//     const verifiedToken = jwt.verify(token, env.JWT_SECRET_TOKEN);
+//     const user = await getUserById(verifiedToken.userId);
 
-    if (!user) {
-      res.statusCode = 403;
-      throw new Error("Not authorized.");
-    }
+//     if (!user) {
+//       res.statusCode = 403;
+//       throw new Error("Not authorized.");
+//     }
 
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
+//     next();
+//   } catch (error) {
+//     next(error);
+//   }
+// };

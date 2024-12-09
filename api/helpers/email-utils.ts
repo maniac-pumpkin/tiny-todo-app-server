@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import { verifyToken } from "../db/schema";
+import db from "../db";
 import env from "../env";
 
 const transporter = nodemailer.createTransport({
@@ -27,4 +29,18 @@ export const sendMail = async (
   } catch (err) {
     console.error(err);
   }
+};
+
+export const sendVerificationMail = async (userId: number, client: string) => {
+  const generatedToken = crypto.randomUUID();
+
+  await db.insert(verifyToken).values({
+    userId: userId,
+    token: generatedToken,
+  });
+  await sendMail(
+    client,
+    "Email verification",
+    `${env.SERVER_URL}:${env.SERVER_PORT}/users/${userId}/${generatedToken}`
+  );
 };

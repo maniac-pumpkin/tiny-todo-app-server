@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2016",
+    "target": "ESNext",
     "module": "Preserve",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -9,6 +9,8 @@
     "moduleDetection": "force",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "outDir": "./dist"
   }
 }
