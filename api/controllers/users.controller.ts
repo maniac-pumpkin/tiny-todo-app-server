@@ -37,7 +37,7 @@ export const signInUser: RequestHandler = async (req, res, next) => {
 
     if (!availableUser) {
       res.statusCode = 404;
-      throw new Error("User not found.");
+      throw "User not found.";
     }
 
     if (!availableUser!.isVerified) {
