@@ -8,7 +8,7 @@ import { users, verifyToken } from "../db/schema";
 import env from "../env";
 import { sendVerificationMail } from "../helpers/email-utils";
 
-export const registerUser: RequestHandler = async (req, res, next) => {
+export const signUpUser: RequestHandler = async (req, res, next) => {
   try {
     const hashedPass = await bcrypt.hash(req.body.password, 8);
     const [addedUser] = await db
@@ -61,6 +61,27 @@ export const signInUser: RequestHandler = async (req, res, next) => {
     });
 
     res.send(jwtToken);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUser: RequestHandler = async (req, res, next) => {
+  try {
+    const [, authToken] = req.headers.authorization!.split("Bearer");
+
+    const verifiedToken = jwt.verify(
+      authToken.trim(),
+      env.JWT_SECRET_TOKEN
+    ) as {
+      id: number;
+      iat: number;
+      exp: number;
+    };
+
+    await db.delete(users).where(eq(users.id, verifiedToken.id));
+
+    res.send("User deleted.");
   } catch (error) {
     next(error);
   }

@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { z } from "zod";
 import {
+  signUpUser,
   signInUser,
-  registerUser,
+  deleteUser,
   verifyUserEmail,
 } from "../controllers/users.controller";
 import { validateReqKey } from "../middleware/custom";
@@ -28,12 +29,16 @@ const userVerifyEmailSchema = z.object({
   token: z.string(),
 });
 
+const deleteUserSchema = z.object({
+  authorization: z.string().trim().includes("Bearer"),
+});
+
 const route = Router();
 
 route.post(
   "/sign-up",
   validateReqKey(userRegistrationSchema, "body"),
-  registerUser
+  signUpUser
 );
 
 route.post("/sign-in", validateReqKey(userSignInSchema, "body"), signInUser);
@@ -43,5 +48,7 @@ route.get(
   validateReqKey(userVerifyEmailSchema, "params"),
   verifyUserEmail
 );
+
+route.delete("/", validateReqKey(deleteUserSchema, "headers"), deleteUser);
 
 export default route;
