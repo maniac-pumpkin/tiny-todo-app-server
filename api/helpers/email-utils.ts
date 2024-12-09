@@ -41,6 +41,6 @@ export const sendVerificationMail = async (userId: number, client: string) => {
   await sendMail(
     client,
     "Email verification",
-    `${env.SERVER_URL}:${env.SERVER_PORT}/users/${userId}/${generatedToken}`
+    `${env.SERVER_URL}/users/${userId}/${generatedToken}`
   );
 };
