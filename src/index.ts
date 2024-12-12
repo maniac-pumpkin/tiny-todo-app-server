@@ -11,6 +11,10 @@ import directoriesRoute from "./routes/directories.route";
 
 const server = express();
 
+server.get("/", (_, res) => {
+  res.send("Welcome");
+});
+
 server.use(middlewares);
 server.use("/api/users", usersRoute);
 server.use("/api/tasks", tasksRoute);
