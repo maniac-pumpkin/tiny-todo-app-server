@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS "directories" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"name" varchar(15) NOT NULL,
+	"name" varchar(20) NOT NULL,
 	"user_id" integer NOT NULL,
 	CONSTRAINT "unique_user_directory" UNIQUE("user_id","name")
 );
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS "directories" (
 CREATE TABLE IF NOT EXISTS "tasks" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" varchar(25) NOT NULL,
-	"description" varchar(80),
+	"description" varchar(80) DEFAULT '',
 	"deadline" timestamp NOT NULL,
 	"is_important" boolean DEFAULT false,
 	"is_completed" boolean DEFAULT false,
@@ -18,10 +18,11 @@ CREATE TABLE IF NOT EXISTS "tasks" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"name" varchar(100) NOT NULL,
+	"username" varchar(100) NOT NULL,
 	"password" text NOT NULL,
-	"email" varchar NOT NULL,
+	"email" varchar(254) NOT NULL,
 	"is_verified" boolean DEFAULT false,
+	CONSTRAINT "users_username_unique" UNIQUE("username"),
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint

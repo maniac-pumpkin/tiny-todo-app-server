@@ -23,7 +23,7 @@ export const signUpUser: RequestHandler = async (req, res, next) => {
 
     await sendVerificationMail(addedUser!.id, addedUser!.email);
 
-    res.send("Email has been sent for verification, Please check your inbox.");
+    res.sendStatus(201);
   } catch (error) {
     next(error);
   }
@@ -53,8 +53,8 @@ export const signInUser: RequestHandler = async (req, res, next) => {
     );
 
     if (!isPassCorrect) {
-      res.statusCode = 404;
-      throw "User not found.";
+      res.statusCode = 401;
+      throw "Invalid credentials.";
     }
 
     const jwtToken = jwt.sign(
@@ -63,7 +63,7 @@ export const signInUser: RequestHandler = async (req, res, next) => {
       { expiresIn: "24h" }
     );
 
-    res.send(jwtToken);
+    res.status(200).send(jwtToken);
   } catch (error) {
     next(error);
   }
@@ -71,12 +71,9 @@ export const signInUser: RequestHandler = async (req, res, next) => {
 
 export const deleteUser: RequestHandler = async (req, res, next) => {
   try {
-    const [deletedUser] = await db
-      .delete(users)
-      .where(eq(users.id, req.body.userId))
-      .returning();
+    await db.delete(users).where(eq(users.id, req.body.userId));
 
-    res.status(204).json(deletedUser);
+    res.sendStatus(204);
   } catch (error) {
     next(error);
   }
@@ -88,17 +85,17 @@ export const updateUser: RequestHandler = async (req, res, next) => {
       ? await bcrypt.hash(req.body.password, 8)
       : undefined;
 
-    const [updatedUser] = await db
+    await db
       .update(users)
       .set({
         username: req.body.username ?? sql`${users.username}`,
         password: password ?? sql`${users.password}`,
         email: req.body.email ?? sql`${users.email}`,
+        isVerified: false,
       })
-      .where(eq(users.id, req.body.userId))
-      .returning();
+      .where(eq(users.id, req.body.userId));
 
-    res.status(200).json(updatedUser);
+    res.sendStatus(200);
   } catch (error) {
     next(error);
   }
@@ -131,7 +128,7 @@ export const verifyUserEmail: RequestHandler = async (req, res, next) => {
       .delete(verifyToken)
       .where(eq(verifyToken.userId, +req.params.userId));
 
-    res.send("Email has been successfully verified.");
+    res.status(200).send("Email has been successfully verified.");
   } catch (error) {
     next(error);
   }

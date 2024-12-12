@@ -1,5 +1,5 @@
 {
-  "id": "5a0cd7d8-53a1-4e45-8772-e1490bebb860",
+  "id": "61bce2e9-cfb7-4f65-8d2f-8f4ece1ae703",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -16,7 +16,7 @@
         },
         "name": {
           "name": "name",
-          "type": "varchar(15)",
+          "type": "varchar(20)",
           "primaryKey": false,
           "notNull": true
         },
@@ -78,7 +78,8 @@
           "name": "description",
           "type": "varchar(80)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "''"
         },
         "deadline": {
           "name": "deadline",
@@ -146,8 +147,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "username": {
+          "name": "username",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
@@ -160,7 +161,7 @@
         },
         "email": {
           "name": "email",
-          "type": "varchar",
+          "type": "varchar(254)",
           "primaryKey": false,
           "notNull": true
         },
@@ -176,6 +177,13 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
+          ]
+        },
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,

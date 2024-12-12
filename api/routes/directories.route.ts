@@ -9,10 +9,7 @@ import {
 } from "../controllers/directories.controller";
 
 const commonBodySchema = z.object({
-  name: z
-    .string()
-    .min(1, { message: "Directory name is required" })
-    .max(20, { message: "Directory name must be 20 characters or less" }),
+  name: z.string().min(1).max(20),
 });
 
 const route = Router();

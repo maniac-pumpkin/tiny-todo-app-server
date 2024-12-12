@@ -23,10 +23,10 @@ export const createTask: RequestHandler = async (req, res, next) => {
       .insert(tasks)
       .values({
         title: req.body.title,
-        description: req.body.description,
-        deadline: new Date(),
-        isCompleted: req.body.isCompleted,
-        isImportant: req.body.isImportant,
+        description: req.body.description ?? "",
+        deadline: req.body.deadline,
+        isCompleted: req.body.isCompleted ?? false,
+        isImportant: req.body.isImportant ?? false,
         directoryId: +req.params.dirId,
       })
       .returning();

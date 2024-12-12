@@ -12,10 +12,15 @@ const route = Router();
 
 const createTaskSchema = z.object({
   title: z.string().min(3).max(25),
-  description: z.string().max(80).optional(),
+  description: z.string().max(80).nullable(),
   deadline: z.string(),
-  isCompleted: z.boolean().optional(),
-  isImportant: z.boolean().optional(),
+  isCompleted: z.boolean().nullable(),
+  isImportant: z.boolean().nullable(),
+});
+
+const updateTaskSchema = createTaskSchema.extend({
+  title: createTaskSchema.shape.title.nullable(),
+  deadline: createTaskSchema.shape.deadline.nullable(),
 });
 
 route.get("/", resolveAuthToken, getTasks);
@@ -27,7 +32,12 @@ route.post(
   createTask
 );
 
-route.put("/:taskId", resolveAuthToken, updateTask);
+route.put(
+  "/:taskId",
+  resolveAuthToken,
+  validateReqKey(updateTaskSchema, "body"),
+  updateTask
+);
 
 route.delete("/:taskId", resolveAuthToken, deleteTask);
 
