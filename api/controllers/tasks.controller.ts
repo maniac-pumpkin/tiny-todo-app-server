@@ -9,7 +9,9 @@ export const getTasks: RequestHandler = async (req, res, next) => {
       .select()
       .from(tasks)
       .innerJoin(directories, eq(tasks.directoryId, directories.id))
-      .where(eq(directories.userId, req.body.userId));
+      .where(eq(directories.userId, req.body.userId))
+      .offset(Number(req.query.offset || 0))
+      .limit(Number(req.query.limit || -1));
 
     res.status(200).json(tasksByUser);
   } catch (error) {
