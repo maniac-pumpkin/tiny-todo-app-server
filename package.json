@@ -1,11 +1,11 @@
 {
   "name": "tiny-todo-app-server",
-  "main": "api/index.ts",
+  "main": "src/index.ts",
   "version": "1.0.0",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "tsx watch api/index.ts",
+    "start": "tsx watch src/index.ts",
     "studio": "drizzle-kit studio --port=1080",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",

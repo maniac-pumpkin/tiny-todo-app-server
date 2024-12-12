@@ -1,8 +1,14 @@
 [build]
   functions = "src"
+  command = "npm run start"
+
+[dev]
+  command = "npm run start"
+  port = 80
+  targetPort = 3000
 
 [[redirects]]
   force=true
   status=200
   from="/api/*"
-  to="/.netlify/src/api/:splat"
+  to="/.netlify/stc/api/:splat"
