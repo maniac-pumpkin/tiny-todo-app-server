@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import serverlessHttp from "serverless-http";
 
 import env from "./helpers/env";
 import middlewares from "./middleware";
@@ -19,4 +20,4 @@ server.listen(env.SERVER_PORT, () =>
   console.info(`Server is running on ${env.SERVER_URL}:${env.SERVER_PORT}`)
 );
 
-export default server;
+export const handler = serverlessHttp(server);
