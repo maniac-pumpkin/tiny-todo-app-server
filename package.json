@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
-    "@netlify/functions": "^2.8.2",
     "bcrypt": "^5.1.1",
     "compression": "^1.7.5",
     "cors": "^2.8.5",
