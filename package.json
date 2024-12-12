@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "start": "tsx watch api/index.ts",
+    "studio": "drizzle-kit studio --port=1080",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "push": "drizzle-kit push"

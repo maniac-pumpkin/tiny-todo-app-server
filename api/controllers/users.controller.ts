@@ -5,12 +5,13 @@ import jwt from "jsonwebtoken";
 
 import db from "../db";
 import { users, verifyToken } from "../db/schema";
-import env from "../env";
+import env from "../helpers/env";
 import { sendVerificationMail } from "../helpers/email-utils";
 
 export const signUpUser: RequestHandler = async (req, res, next) => {
   try {
     const hashedPass = await bcrypt.hash(req.body.password, 8);
+
     const [addedUser] = await db
       .insert(users)
       .values({
@@ -56,9 +57,11 @@ export const signInUser: RequestHandler = async (req, res, next) => {
       throw "User not found.";
     }
 
-    const jwtToken = jwt.sign({ id: availableUser!.id }, env.JWT_SECRET_TOKEN, {
-      expiresIn: "24h",
-    });
+    const jwtToken = jwt.sign(
+      { userId: availableUser!.id },
+      env.JWT_SECRET_TOKEN,
+      { expiresIn: "24h" }
+    );
 
     res.send(jwtToken);
   } catch (error) {
@@ -68,20 +71,34 @@ export const signInUser: RequestHandler = async (req, res, next) => {
 
 export const deleteUser: RequestHandler = async (req, res, next) => {
   try {
-    const [, authToken] = req.headers.authorization!.split("Bearer");
+    const [deletedUser] = await db
+      .delete(users)
+      .where(eq(users.id, req.body.userId))
+      .returning();
 
-    const verifiedToken = jwt.verify(
-      authToken.trim(),
-      env.JWT_SECRET_TOKEN
-    ) as {
-      id: number;
-      iat: number;
-      exp: number;
-    };
+    res.status(204).json(deletedUser);
+  } catch (error) {
+    next(error);
+  }
+};
 
-    await db.delete(users).where(eq(users.id, verifiedToken.id));
+export const updateUser: RequestHandler = async (req, res, next) => {
+  try {
+    const password = req.body.password
+      ? await bcrypt.hash(req.body.password, 8)
+      : undefined;
 
-    res.send("User deleted.");
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        username: req.body.username ?? sql`${users.username}`,
+        password: password ?? sql`${users.password}`,
+        email: req.body.email ?? sql`${users.email}`,
+      })
+      .where(eq(users.id, req.body.userId))
+      .returning();
+
+    res.status(200).json(updatedUser);
   } catch (error) {
     next(error);
   }

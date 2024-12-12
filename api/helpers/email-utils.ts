@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { verifyToken } from "../db/schema";
 import db from "../db";
-import env from "../env";
+import env from "./env";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.mail.yahoo.com",
@@ -41,6 +41,6 @@ export const sendVerificationMail = async (userId: number, client: string) => {
   await sendMail(
     client,
     "Email verification",
-    `${env.SERVER_URL}/users/${userId}/${generatedToken}`
+    `${env.SERVER_URL}/api/users/${userId}/${generatedToken}`
   );
 };

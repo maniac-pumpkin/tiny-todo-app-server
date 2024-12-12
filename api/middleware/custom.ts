@@ -1,5 +1,13 @@
 import type { RequestHandler, Request, Response, NextFunction } from "express";
 import { ZodError, ZodSchema } from "zod";
+import jwt from "jsonwebtoken";
+import env from "../helpers/env";
+
+export const logger: RequestHandler = (req, _, next) => {
+  const time = new Date().toUTCString();
+  console.info(req.method, req.hostname, req.path, time);
+  next();
+};
 
 export const errorHandler = (
   err: any,
@@ -32,8 +40,28 @@ export const validateReqKey = (schema: ZodSchema, reqKey: keyof Request) => {
   };
 };
 
-export const logger: RequestHandler = (req, _, next) => {
-  const time = new Date(Date.now()).toString();
-  console.info(req.method, req.hostname, req.path, time);
-  next();
+export const resolveAuthToken: RequestHandler = async (req, _, next) => {
+  try {
+    const [, authToken] = req.headers.authorization!.split("Bearer");
+
+    if (!authToken) {
+      req.statusCode = 401;
+      throw "Auth token is required.";
+    }
+
+    const verifiedToken = jwt.verify(
+      authToken.trim(),
+      env.JWT_SECRET_TOKEN
+    ) as {
+      userId: number;
+      iat: number;
+      exp: number;
+    };
+
+    req.body = { ...req.body, userId: verifiedToken.userId };
+
+    next();
+  } catch (error) {
+    next(error);
+  }
 };

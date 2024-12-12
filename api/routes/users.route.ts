@@ -6,7 +6,7 @@ import {
   deleteUser,
   verifyUserEmail,
 } from "../controllers/users.controller";
-import { validateReqKey } from "../middleware/custom";
+import { validateReqKey, resolveAuthToken } from "../middleware/custom";
 
 const userSignInSchema = z.object({
   username: z
@@ -20,35 +20,18 @@ const userSignInSchema = z.object({
     .min(8, "Password must be at least 8 characters long"),
 });
 
-const userRegistrationSchema = userSignInSchema.extend({
+const userSignUpSchema = userSignInSchema.extend({
   email: z.string().trim().email("Invalid email address"),
-});
-
-const userVerifyEmailSchema = z.object({
-  userId: z.string(),
-  token: z.string(),
-});
-
-const deleteUserSchema = z.object({
-  authorization: z.string().trim().includes("Bearer"),
 });
 
 const route = Router();
 
-route.post(
-  "/sign-up",
-  validateReqKey(userRegistrationSchema, "body"),
-  signUpUser
-);
+route.post("/sign-up", validateReqKey(userSignUpSchema, "body"), signUpUser);
 
 route.post("/sign-in", validateReqKey(userSignInSchema, "body"), signInUser);
 
-route.get(
-  "/:userId/:token",
-  validateReqKey(userVerifyEmailSchema, "params"),
-  verifyUserEmail
-);
+route.delete("/", resolveAuthToken, deleteUser);
 
-route.delete("/", validateReqKey(deleteUserSchema, "headers"), deleteUser);
+route.get("/:userId/:token", verifyUserEmail);
 
 export default route;
