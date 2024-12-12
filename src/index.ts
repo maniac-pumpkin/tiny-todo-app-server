@@ -21,7 +21,7 @@ server.use("/api/tasks", tasksRoute);
 server.use("/api/directories", directoriesRoute);
 
 server.listen(env.SERVER_PORT, () =>
-  console.info(`Server is running on ${env.SERVER_URL}:${env.SERVER_PORT}`)
+  console.info(`Launched on ${env.SERVER_URL}:${env.SERVER_PORT}`)
 );
 
 export const handler = serverlessHttp(server);
