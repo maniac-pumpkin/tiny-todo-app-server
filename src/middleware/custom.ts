@@ -44,13 +44,16 @@ export const resolveAuthToken: RequestHandler = async (req, _, next) => {
   try {
     const authToken = req.headers.authorization;
 
-    if (!authToken?.includes("Bearer")) {
+    if (
+      !authToken?.startsWith("Bearer ") ||
+      !authToken.split("Bearer ").at(1)
+    ) {
       req.statusCode = 401;
-      throw "Auth token is required.";
+      throw "Invalid auth token.";
     }
 
     const verifiedToken = jwt.verify(
-      authToken.split("Bearer").at(1)!,
+      authToken.split("Bearer ").at(1)!,
       env.JWT_SECRET_TOKEN
     ) as {
       userId: number;
