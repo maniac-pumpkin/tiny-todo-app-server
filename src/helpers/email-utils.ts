@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import crypto from "node:crypto";
 import { verifyToken } from "../db/schema";
 import db from "../db";
 import env from "./env";
