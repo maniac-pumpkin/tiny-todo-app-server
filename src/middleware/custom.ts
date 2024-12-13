@@ -42,15 +42,17 @@ export const validateReqKey = (schema: ZodSchema, reqKey: keyof Request) => {
 
 export const resolveAuthToken: RequestHandler = async (req, _, next) => {
   try {
-    const [, authToken] = req.headers.authorization!.split("Bearer");
+    const authToken = req.headers.authorization?.includes("Bearer")
+      ? req.headers.authorization.split("Bearer")
+      : null;
 
-    if (!authToken) {
+    if (!authToken?.at(1)) {
       req.statusCode = 401;
       throw "Auth token is required.";
     }
 
     const verifiedToken = jwt.verify(
-      authToken.trim(),
+      authToken.at(1)!,
       env.JWT_SECRET_TOKEN
     ) as {
       userId: number;

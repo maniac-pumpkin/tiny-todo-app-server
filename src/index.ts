@@ -14,6 +14,8 @@ server.get("/api", (_, res) => {
   res.send("Welcome");
 });
 
+server.listen(80, () => console.log("Launched."));
+
 server.use(middlewares);
 server.use("/api/users", usersRoute);
 server.use("/api/tasks", tasksRoute);
